@@ -305,7 +305,7 @@ async function clickedIndex(rowIndex, pixelIndex) {
     body: JSON.stringify({
       "x": pixelIndex,
       "y": rowIndex,
-      "color": (parseInt(color.value.slice(1), 16) * 256) + 255
+      "color": (parseInt(color.value, 16) * 256) + 255
     })
   });
 
