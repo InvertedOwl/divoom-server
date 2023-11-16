@@ -343,7 +343,7 @@ function getColorAt(rowIndex, pixelIndex) {
 
 <template>
   <div class="global-container">
-    <h1>My display</h1>
+    <h1>My Display</h1>
     <input type="color" value="#FFFFFF" name="" id="" @input="event => color = event.target.value">
     <div class="grid-container">
       <div v-for="(pixelRow, rowIndex) in pixelData" :key="pixelRow" class="row">
@@ -351,9 +351,10 @@ function getColorAt(rowIndex, pixelIndex) {
           <button @click="clickedIndex(rowIndex, pixelIndex)" :style="{ 'background-color': getColorAt(rowIndex, pixelIndex)}"></button>
         </div>
       </div>
-  </div>
+    </div>
 
   </div>
+  <p>This is a website where you can control the little Divoom Timebox Evo on my desk and display anything you want. Pick a color with the color picker and click on squares to get started</p>
 
 </template>
 
@@ -363,10 +364,24 @@ function getColorAt(rowIndex, pixelIndex) {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
 }
 
-h1 {
+h1, p {
   text-align: center;
+}
+
+p {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%);
+}
+input {
+  position: relative;
+  left: 50%;
+  transform: translate(-50%);
 }
 
 .grid-container {
