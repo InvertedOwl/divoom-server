@@ -295,7 +295,7 @@ const color = ref(16777215);
 
 
 async function clickedIndex(rowIndex, pixelIndex) {
-  console.log(color.value.toString(16))
+  console.log(color.value)
   pixelData.value[rowIndex][pixelIndex] = color.value;
   await fetch("/pixel", {
     method: "POST",
@@ -305,7 +305,7 @@ async function clickedIndex(rowIndex, pixelIndex) {
     body: JSON.stringify({
       "x": pixelIndex,
       "y": rowIndex,
-      "color": (color.value * 256) + 255
+      "color": (parseInt(color.value.slice(1), 16) * 256) + 255
     })
   });
 
@@ -326,16 +326,29 @@ setInterval(() => {
 update();
 
 
+function getColorAt(rowIndex, pixelIndex) {
+  console.log(pixelData.value[rowIndex][pixelIndex]);
+
+  if (pixelData.value[rowIndex][pixelIndex] == 255) {
+    return "#000000"
+  }
+  if (typeof pixelData.value[rowIndex][pixelIndex] == String) {
+    return pixelData.value[rowIndex][pixelIndex].padStart(8, '0');
+  } else {
+    return "#" + (parseInt(pixelData.value[rowIndex][pixelIndex])).toString(16).padStart(8, '0');
+  }
+}
+
 </script>
 
 <template>
   <div class="global-container">
     <h1>My display</h1>
-    <input type="color" value="#FFFFFF" name="" id="" @input="event => color = parseInt(event.target.value.slice(1), 16)">
+    <input type="color" value="#FFFFFF" name="" id="" @input="event => color = event.target.value">
     <div class="grid-container">
       <div v-for="(pixelRow, rowIndex) in pixelData" :key="pixelRow" class="row">
         <div v-for="(pixel, pixelIndex) in pixelRow" :key="pixel" class="pixel">
-          <button @click="clickedIndex(rowIndex, pixelIndex)" :style="{ 'background-color': '#' + pixelData[rowIndex][pixelIndex].toString(16) }"></button>
+          <button @click="clickedIndex(rowIndex, pixelIndex)" :style="{ 'background-color': getColorAt(rowIndex, pixelIndex)}"></button>
         </div>
       </div>
   </div>
