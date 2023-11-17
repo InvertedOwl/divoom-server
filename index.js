@@ -2,6 +2,18 @@ const express = require('express')
 const fetch = require('node-fetch');
 const app = express()
 const port = 3080
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+	windowMs: 1000, // 1 sec
+	limit: 10, // 25 requests per second
+	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	// store: ... , // Use an external store for consistency across multiple server instances.
+})
+
+// Apply the rate limiting middleware to all requests.
+app.use(limiter)
 app.use(express.static(__dirname + "/divoom-interface/dist/"));
 app.use(express.json());
 
