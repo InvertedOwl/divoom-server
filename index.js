@@ -17,7 +17,7 @@ app.get('/pixels', async (req, res) => {
 
 
 app.post('/pixel', async(req, res) => {
-    const response = await fetch('http://192.168.0.4:3000/pixel', {
+    await fetch('http://192.168.0.4:3000/pixel', {
         method: "POST",
         headers: {
           "Content-Type": "application/json; charset=utf-8"
