@@ -11,13 +11,13 @@ app.get('/', (req, res) => {
 })
 
 app.get('/pixels', async (req, res) => {
-    const response = await fetch('http://192.168.0.4:3000/pixels')
+    const response = await fetch('http://192.168.0.2:3000/pixels')
     res.send(await response.json());
 })
 
 
 app.post('/pixel', async(req, res) => {
-    await fetch('http://192.168.0.4:3000/pixel', {
+    await fetch('http://192.168.0.2:3000/pixel', {
         method: "POST",
         headers: {
           "Content-Type": "application/json; charset=utf-8"
