@@ -1,8 +1,70 @@
 const express = require('express')
-const fetch = require('node-fetch');
 const app = express()
 const port = 3080
+const http = require('http');
 
+const server = http.createServer(app);
+
+const WebSocket = require('ws');
+
+let data = {};
+let connected = false;
+
+/* - Webscript Server - */
+const wss = new WebSocket.Server({server: server });
+
+wss.on('connection', function connection(wsss) {
+  wsss.on('message', function incoming(message) {
+    const json = JSON.parse(message.toString());
+    const action = json.action;
+
+    if (action == 'pixel') {
+      if (connected)
+        ws.send(message.toString());
+      console.log(message.toString());
+    } else {
+      console.log("Getting pixels");
+      if (connected)
+        ws.send('{"action":"pixels"}');
+      wsss.send(JSON.stringify(data));
+    }
+  });
+});
+let ws;
+
+/* - Webscript Client - */
+function connectWithClient() {
+  try {
+    ws = new WebSocket('ws://192.168.0.2:3001');
+
+    ws.on('open', function open() {
+      console.log('Connected to the server');
+      if (ws.readyState === WebSocket.OPEN)
+      ws.send('{"action":"pixels"}');
+      connected = true;
+    });
+    
+    ws.on('message', function message(d) {
+      data = JSON.parse(d.toString());
+    });
+  
+    ws.on('close', function error() {
+      setTimeout(connectWithClient, 1000);
+      connected = false;
+    });
+
+    ws.on('error', function error() {
+      setTimeout(connectWithClient, 1000);
+      connected = false;
+    });
+  } catch(e) {
+    console.log(e);
+    setTimeout(connectWithClient, 1000);
+  }
+}
+connectWithClient();
+
+/* - Actual Server - */
 app.use(express.static(__dirname + "/divoom-interface/dist/"));
 app.use(express.json());
 
@@ -10,27 +72,17 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + "/divoom-interface/dist/index.html");
 })
 
-app.get('/pixels', async (req, res) => {
-    const response = await fetch('http://192.168.0.2:3000/pixels')
-    res.send(await response.json());
-})
+// app.get('/pixels', async (req, res) => {
+//   ws.send('{"action":"pixels"}');
+//   res.send(JSON.stringify(data));
+// })
 
 
-app.post('/pixel', async(req, res) => {
-    await fetch('http://192.168.0.2:3000/pixel', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({
-          "x": req.body.x,
-          "y": req.body.y,
-          "color": req.body.color
-        })
-    });
-    res.sendStatus(200);
-});
+// app.post('/pixel', async(req, res) => {
+//   ws.send('{"action":"pixel", "x":' + req.body.x + ', "y":' + req.body.y + ', "color":"' + req.body.color + '"}');
+//   res.sendStatus(200);
+// });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })

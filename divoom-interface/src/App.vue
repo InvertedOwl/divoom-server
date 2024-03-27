@@ -291,43 +291,43 @@ const pixelData = ref([
         4294967295
     ]
 ]);
-const color = ref(16777215);
+const color = ref("#FFFFFF");
+console.log(window.location);
+let ws = new WebSocket(window.location.origin.replace(/^http/, 'ws'));
+
+ws.onopen = () => {
+  console.log('Connected to the WebSocket server');
+  ws.send('{"action":"pixels"}');
+};
+ws.onmessage = (event) => {
+  pixelData.value = JSON.parse(event.data);
+};
 
 
 async function clickedIndex(rowIndex, pixelIndex) {
-  console.log(color.value)
-  pixelData.value[rowIndex][pixelIndex] = color.value;
-  await fetch("/pixel", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json; charset=utf-8"
-    },
-    body: JSON.stringify({
-      "x": pixelIndex,
-      "y": rowIndex,
-      "color": (parseInt(color.value.slice(1), 16) * 256) + 255
-    })
-  });
-
+  console.log(color.value);
+  ws.send("{" + `"action":"pixel", "x":${pixelIndex}, "y":${rowIndex}, "color":${parseInt(color.value.slice(1), 16) * 256 + 255}` + "}");
   update();
 }
 
 async function update() {
-  const response = await fetch("/pixels");
-  pixelData.value = await response.json();
+  // const response = await fetch("/pixels");
+
+  ws.send('{"action":"pixels"}');
+  // pixelData.value = await response.json();
 }
 
 setInterval(() => {
   console.log("Updating..");
   update();
-}, 2000);
+}, 1500);
 
 
 update();
 
 
 function getColorAt(rowIndex, pixelIndex) {
-  console.log(pixelData.value[rowIndex][pixelIndex]);
+  // console.log(pixelData.value[rowIndex][pixelIndex]);
 
   if (pixelData.value[rowIndex][pixelIndex] == 255) {
     return "#000000"
