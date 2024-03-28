@@ -11,27 +11,46 @@ let data = {};
 let connected = false;
 
 /* - Webscript Server - */
-const wss = new WebSocket.Server({server: server });
+const socketIo = require('socket.io');
+const io = socketIo(server);
+io.on('connection', (socket) => {
+  console.log('A user connected');
 
-wss.on('connection', function connection(wsss) {
-  wsss.on('message', function incoming(message) {
-    const json = JSON.parse(message.toString());
-    const action = json.action;
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 
-    if (action == 'pixel') {
-      if (connected)
-        ws.send(message.toString());
-      console.log(message.toString());
-    } else {
-      console.log("Getting pixels");
-      if (connected)
-        ws.send('{"action":"pixels"}');
-      wsss.send(JSON.stringify(data));
+  socket.on('pixel', (msg) => {
+    if (connected)
+      ws.send(msg);
+  });
+  socket.on('pixels', (msg) => {
+
+    if (connected) {
+      ws.send('{"action":"pixels"}');
+      io.emit('pixels', JSON.stringify(data));
     }
   });
 });
-let ws;
+// wss.on('connection', function connection(wsss) {
+//   wsss.on('message', function incoming(message) {
+//     const json = JSON.parse(message.toString());
+//     const action = json.action;
 
+//     if (action == 'pixel') {
+
+//       console.log(message.toString());
+//     } else {
+//       console.log("Getting pixels");
+//       if (connected)
+//         ws.send('{"action":"pixels"}');
+//       wsss.send(JSON.stringify(data));
+//     }
+//   });
+// });
+
+
+let ws;
 /* - Webscript Client - */
 function connectWithClient() {
   try {

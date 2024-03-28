@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import io from 'socket.io-client';
 
 const pixelData = ref([
     [
@@ -292,28 +293,25 @@ const pixelData = ref([
     ]
 ]);
 const color = ref("#FFFFFF");
-console.log(window.location);
-let ws = new WebSocket(window.location.origin.replace(/^http/, 'ws'));
+// console.log(window.location);
+// let ws = new WebSocket(window.location.origin.replace(/^http/, 'ws'));
+const socket = io();
 
-ws.onopen = () => {
-  console.log('Connected to the WebSocket server');
-  ws.send('{"action":"pixels"}');
-};
-ws.onmessage = (event) => {
-  pixelData.value = JSON.parse(event.data);
-};
+socket.on('pixels', (msg) => {
+  pixelData.value = JSON.parse(msg);
+});
 
 
 async function clickedIndex(rowIndex, pixelIndex) {
   console.log(color.value);
-  ws.send("{" + `"action":"pixel", "x":${pixelIndex}, "y":${rowIndex}, "color":${parseInt(color.value.slice(1), 16) * 256 + 255}` + "}");
+  socket.emit("pixel", "{" + `"action":"pixel", "x":${pixelIndex}, "y":${rowIndex}, "color":${parseInt(color.value.slice(1), 16) * 256 + 255}` + "}")
   update();
 }
 
 async function update() {
   // const response = await fetch("/pixels");
 
-  ws.send('{"action":"pixels"}');
+  socket.emit("pixels");
   // pixelData.value = await response.json();
 }
 
