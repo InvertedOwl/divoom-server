@@ -11,8 +11,6 @@ const pixelData = ref(
 );
 
 const color = ref("#FFFFFF");
-// console.log(window.location);
-// let ws = new WebSocket(window.location.origin.replace(/^http/, 'ws'));
 const socket = io();
 
 socket.on('pixels', (msg) => {
@@ -27,10 +25,7 @@ async function clickedIndex(rowIndex, pixelIndex) {
 }
 
 async function update() {
-  // const response = await fetch("/pixels");
-
   socket.emit("pixels");
-  // pixelData.value = await response.json();
 }
 
 setInterval(() => {
@@ -43,7 +38,6 @@ update();
 
 
 function getColorAt(rowIndex, pixelIndex) {
-  // console.log(pixelData.value[rowIndex][pixelIndex]);
 
   if (pixelData.value[rowIndex][pixelIndex] == 255) {
     return "#000000"
