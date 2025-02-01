@@ -14,11 +14,6 @@ let connected = false;
 const socketIo = require('socket.io');
 const io = socketIo(server);
 io.on('connection', (socket) => {
-  console.log('A user connected');
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
 
   socket.on('pixel', (msg) => {
     if (connected)
@@ -32,22 +27,6 @@ io.on('connection', (socket) => {
     }
   });
 });
-// wss.on('connection', function connection(wsss) {
-//   wsss.on('message', function incoming(message) {
-//     const json = JSON.parse(message.toString());
-//     const action = json.action;
-
-//     if (action == 'pixel') {
-
-//       console.log(message.toString());
-//     } else {
-//       console.log("Getting pixels");
-//       if (connected)
-//         ws.send('{"action":"pixels"}');
-//       wsss.send(JSON.stringify(data));
-//     }
-//   });
-// });
 
 
 let ws;
@@ -90,17 +69,6 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.sendFile(__dirname + "/divoom-interface/dist/index.html");
 })
-
-// app.get('/pixels', async (req, res) => {
-//   ws.send('{"action":"pixels"}');
-//   res.send(JSON.stringify(data));
-// })
-
-
-// app.post('/pixel', async(req, res) => {
-//   ws.send('{"action":"pixel", "x":' + req.body.x + ', "y":' + req.body.y + ', "color":"' + req.body.color + '"}');
-//   res.sendStatus(200);
-// });
 
 server.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
